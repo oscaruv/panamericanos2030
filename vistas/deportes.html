@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .navbar-top {
+            background-color: #032150;
+            color: white;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .navbar-top h1 {
+            flex-grow: 1;
+        }
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+        .sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+        .open-btn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #032150;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+        }
+
+        .open-btn:hover {
+            font-size: 22px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .menu-title {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .main-adjusted {
+            transition: margin-left .5s;
+            margin-left: 250px; /* Esta debe coincidir con el ancho de la sidebar cuando está abierta */
+        }
+
+        /* Agregamos transición al main para que se ajuste de manera suave */
+        main {
+            transition: margin-left .5s;
+            padding-top: 4%;
+        }
+
+        .titles {
+            text-align: center; 
+            background-color: #032150;
+            color: #f1f1f1;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="navbar-top">
+    <button class="open-btn" onclick="openNav()">☰</button>
+
+    <h1>Panamericanos 2030</h1>
+    
+</div>
+
+<div id="mySidebar" class="sidebar">
+    <div class="sidebar-header">
+        <span class="menu-title">Dashboard</span>
+        <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">×</a>
+    </div>
+    <a href="sedes.html">Sedes</a>
+    <a href="deportes.html">Deportes</a>
+    <a href="deportistas.html">Atletas</a>
+</div>
+<div style="width: 100%; text-align: right;" >
+    <button type="button" class="btn btn-success" style="margin: 1%;" data-toggle="modal" data-target="#modalDeporte">Agregar un deporte</button>
+</div>
+
+<main>
+    <table class="table table-hover">
+        <thead>
+            <tr><th colspan="4" class="titles">Listado De Deportes</th></tr>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Sede</th>
+                <th scope="col">Opciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- <tr>
+              <td style="width: 10%;"></td>
+              <td></td>
+              <td></td>
+              <td style="width: 15%;">
+                <button type="button" class="btn btn-primary">Editar</button>
+                <button type="button" class="btn btn-danger">Eliminar</button>
+              </td>
+            </tr> -->
+          </tbody>
+
+    </table>
+</main>
+
+<!-- Modal para Deportes -->
+<div class="modal fade" id="modalDeporte" tabindex="-1" role="dialog" aria-labelledby="modalDeporteLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDeporteLabel">Deporte</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formDeporte1">
+            <input type="hidden" id="deporteId" value="">
+            <div class="form-group">
+              <label for="nombreDeporte">Nombre:</label>
+              <input type="text" class="form-control" id="nombreDeporte" required>
+            </div>
+            <div class="form-group">
+              <label for="selectSede">Sede:</label>
+              <!-- Este debe ser un select con la lista de sedes -->
+              <select class="form-control" id="selectSede" required>
+                <!-- Opciones de sedes -->
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" form="formDeporte1" class="btn btn-primary" onclick="addDeporte()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal para Deportes -->
+<div class="modal fade" id="modalDeporteEditar" tabindex="-1" role="dialog" aria-labelledby="modalDeporteLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDeporteLabel1">Deporte</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formDeporte">
+            <input type="hidden" id="deporteId" value="">
+            <div class="form-group">
+              <label for="nombreDeporteEdit">Nombre:</label>
+              <input type="text" class="form-control" id="nombreDeporteEdit" required>
+            </div>
+            <input type="hidden" class="form-control" id="idDeporteEdit">
+            <div class="form-group">
+              <label for="selectSedeEdit">Sede:</label>
+              <select class="form-control" id="selectSedeEdit" required>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" form="formDeporte" class="btn btn-primary" onclick="updateDeporte()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+<script>
+     function fetchSedes() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorSedes.php')
+        .then(response => response.json())
+        .then(data => selectSedes(data))
+        .then(data => selectSedes2(data))
+        .catch(error => console.error('Error:', error));
+    }
+     function fetchSedes2() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorSedes.php')
+        .then(response => response.json())
+        .then(data => selectSedes2(data))
+        .catch(error => console.error('Error:', error));
+    }
+
+    fetchSedes()
+    fetchSedes2()
+
+    function selectSedes(data){
+        const select = document.getElementById('selectSede');
+        data.forEach(item => {
+            
+            var optionElement = document.createElement("option");
+            optionElement.value = item.id_sede;
+            optionElement.text = item.ubicacion;
+            select.appendChild(optionElement);
+
+        });
+    }
+    function selectSedes2(data){
+        const selectSedeEdit = document.getElementById('selectSedeEdit');
+        data.forEach(item => {
+            
+            var optionElement = document.createElement("option");
+            optionElement.value = item.id_sede;
+            optionElement.text = item.ubicacion;
+            selectSedeEdit.appendChild(optionElement);
+
+        });
+    }
+
+    function openNav() {
+        document.getElementById("mySidebar").style.width = "250px";
+        document.querySelector("main").classList.add("main-adjusted");
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+        document.querySelector("main").classList.remove("main-adjusted");
+    }
+
+    function fetchDeportes() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorDeportes.php')
+        .then(response => response.json())
+        .then(data => displayDeportes(data))
+        .catch(error => console.error('Error:', error));
+    }
+
+    function displayDeportes(deportes) {
+        const tbody = document.querySelector('table.table tbody');
+        tbody.innerHTML = ''; 
+        deportes.forEach(deporte => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${deporte.id_deporte}</td>
+                <td>${deporte.nombre}</td>
+                <td>${deporte.ubicacion}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" onclick="editDeporte(${deporte.id_deporte}, '${deporte.nombre}', '${deporte.ubicacion}', ${deporte.id_sede})">Editar</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteDeporte(${deporte.id_deporte})">Eliminar</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+
+    }
+
+    function editDeporte(id_deporte, nombre, ubicacion, id_sede) {
+        document.getElementById('nombreDeporteEdit').value = nombre
+        document.getElementById('selectSedeEdit').value = id_sede
+        document.getElementById('idDeporteEdit').value = id_deporte
+
+        $('#modalDeporteEditar').modal('show');
+    }
+
+    function updateDeporte() {
+        nombre = document.getElementById('nombreDeporteEdit').value
+        id_sede = document.getElementById('selectSedeEdit').value
+        id_deporte = document.getElementById('idDeporteEdit').value
+        const data = {
+            nombre: nombre,
+            id_sede: id_sede,
+            id_deporte: id_deporte
+        };
+
+    fetch(`http://localhost/panamericanos2030/controladores/controladorDeportes.php`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(() => fetchDeportes())
+        .catch(error => console.error('Error:', error));
+    }
+
+    function addDeporte() {
+        var nombreDeporte = document.getElementById('nombreDeporte').value;
+        var sedeDeporte = document.getElementById('selectSede').value;
+        console.log("entro", nombreDeporte, sedeDeporte);
+        const data = {
+            nombreDeporte: nombreDeporte,
+            sedeDeporte: sedeDeporte,
+
+        };
+
+        fetch('http://localhost/panamericanos2030/controladores/controladorDeportes.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(() => fetchDeportes())
+        .catch(error => console.error('Error:', error));
+    }
+
+    function deleteDeporte(id) {
+        console.log(id)
+        fetch(`http://localhost/panamericanos2030/controladores/controladorDeportes.php`, {
+            method: 'DELETE',
+            body: JSON.stringify({ id_deporte: id }), // Incluir el objeto en el cuerpo
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(() => fetchDeportes())
+        .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchDeportes();
+    });
+
+    // Event listener para abrir el modal para agregar un nuevo deporte
+    document.querySelector('.btn-success').addEventListener('click', function() {
+        // Limpiar el formulario y establecer el título del modal como "Agregar Deporte"
+        document.getElementById('formDeporte').reset();
+        document.getElementById('deporteId').value = '';
+        document.querySelector('#modalDeporteLabel').innerText = 'Agregar un deporte';
+        
+        // Aqui deberias cargar las sedes disponibles en el select
+        // ...
+
+        // Abrir el modal
+        $('#modalDeporte').modal('show');
+    });
+
+    // Event listener para los botones de "Editar", aquí necesitas proporcionar tu propia lógica
+    // para obtener los datos del deporte a editar y poblar el formulario correspondiente.
+    // document.querySelectorAll('.btn-primary').forEach(function(btnEdit) {
+    //     btnEdit.addEventListener('click', function() {
+    //         // Aquí deberías obtener los datos del deporte seleccionado para editar
+    //         // ...
+
+    //         // Establecer título y valores para el modal de edición
+    //         document.querySelector('#modalDeporteLabel').innerText = 'Editar Deporte';
+    //         // Establecer los valores de los campos con la información del deporte (usar tus propios datos)
+    //         document.getElementById('deporteId').value = 'ID_ejemplo';
+    //         document.getElementById('nombreDeporte').value = 'Nombre_ejemplo';
+    //         // Actualiza el select con el valor de la sede
+    //         document.getElementById('sedeDeporte').value = 'ValorSede_ejemplo';
+
+    //         // Abrir el modal
+    //         $('#modalDeporte').modal('show');
+    //     });
+    // });
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

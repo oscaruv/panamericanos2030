@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .navbar-top {
+            background-color: #032150;
+            color: white;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .navbar-top h1 {
+            flex-grow: 1;
+        }
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+        .sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+        .open-btn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #032150;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+        }
+
+        .open-btn:hover {
+            font-size: 22px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .menu-title {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .main-adjusted {
+            transition: margin-left .5s;
+            margin-left: 250px; /* Esta debe coincidir con el ancho de la sidebar cuando está abierta */
+        }
+
+        /* Agregamos transición al main para que se ajuste de manera suave */
+        main {
+            transition: margin-left .5s;
+            padding-top: 4%;
+        }
+
+        .titles {
+            text-align: center; 
+            background-color: #032150;
+            color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="navbar-top">
+    <button class="open-btn" onclick="openNav()">☰</button>
+
+    <h1>Panamericanos 2030</h1>
+    
+</div>
+
+<div id="mySidebar" class="sidebar">
+    <div class="sidebar-header">
+        <span class="menu-title">Dashboard</span>
+        <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">×</a>
+    </div>
+    <a href="sedes.html">Sedes</a>
+    <a href="deportes.html">Deportes</a>
+    <a href="deportistas.html">Atletas</a>
+</div>
+<div style="width: 100%; text-align: right;" >
+    <button type="button" class="btn btn-success" style="margin: 1%;" data-toggle="modal" data-target="#modalSedeAgregar">Agregar una sede</button>
+</div>
+
+<main>
+    <table class="table table-hover">
+        <thead>
+            <tr><th colspan="4" class="titles">Listado De Sedes</th></tr>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Ubicacion</th>
+                <th scope="col">Opciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- <tr>
+              <td style="width: 10%;"></td>
+              <td></td>
+              <td></td>
+              <td style="width: 15%;">
+                <button type="button" class="btn btn-primary">Editar</button>
+                <button type="button" class="btn btn-danger">Eliminar</button>
+              </td>
+            </tr> -->
+          </tbody>
+
+    </table>
+</main>
+
+<!-- Modal para Sedes -->
+<div class="modal fade" id="modalSede" tabindex="-1" role="dialog" aria-labelledby="modalSedeLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalSedeLabel">Editar Sede</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formSede">
+            <input type="hidden" id="sedeId" value="">
+            <div class="form-group">
+              <label for="nombreSede">Ubicacion</label>
+              <input type="text" class="form-control" id="nombreSede" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" form="formSede" class="btn btn-info" onclick="updateSede()">Guardar</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para agregarSedes -->
+<div class="modal fade" id="modalSedeAgregar" tabindex="-1" role="dialog" aria-labelledby="modalSedeLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalSedeLabel1">Agregar Sede</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formSede1">
+            
+            <div class="form-group">
+              <label for="nombreSede">Ubicacion</label>
+              <input type="text" class="form-control" id="nombreSedeAgregar" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" form="formSede1" class="btn btn-info" onclick="addSede()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function openNav() {
+        document.getElementById("mySidebar").style.width = "250px";
+        document.querySelector("main").classList.add("main-adjusted");
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+        document.querySelector("main").classList.remove("main-adjusted");
+    }
+
+    function fetchSedes() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorSedes.php')
+        .then(response => response.json())
+        .then(data => displaySedes(data))
+        .catch(error => console.error('Error:', error));
+
+    }
+
+    function displaySedes(sedes) {
+        const tbody = document.querySelector('table.table tbody');
+        tbody.innerHTML = ''; 
+        sedes.forEach(sede => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${sede.id_sede}</td>
+                <td>${sede.ubicacion}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" onclick="editSede(${sede.id_sede})">Editar</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteSede(${sede.id_sede})">Eliminar</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+
+    }
+
+
+    function displaySede(sede) {
+
+        var ubicacion = sede[0].ubicacion;
+        var id_sede = sede[0].id_sede
+        // Asignar el valor de la ubicacion al input
+        $('#nombreSede').val(ubicacion);
+        $('#sedeId').val(id_sede);
+
+    console.log(sede);
+}
+
+    function fetchSedeById(id) {
+    fetch('http://localhost/panamericanos2030/controladores/consultarSedePorId.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id_sede: id }),
+    })
+        .then(response => response.json())
+        .then(data => displaySede(data))
+        .catch(error => console.error('Error:', error));
+}
+
+    function editSede(id) {
+        fetchSedeById(id)
+        $('#modalSede').modal('show');
+        // console.log(ubicacion);
+
+    }
+
+    function updateSede() {
+        const ubicacion = document.getElementById('nombreSede').value;
+        const id_sede = document.getElementById('sedeId').value;
+        const data = {
+            id_sede: id_sede,
+            nueva_ubicacion : ubicacion,
+        };
+
+        fetch(`http://localhost/panamericanos2030/controladores/controladorSedes.php`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(() => fetchSedes())
+            .catch(error => console.error('Error:', error));
+    }
+
+    function addSede() {
+
+        var inputUbicacion = document.getElementById('nombreSedeAgregar').value;
+        console.log(inputUbicacion)
+        const data = {
+            inputUbicacion: inputUbicacion       
+        };
+
+        fetch('http://localhost/panamericanos2030/controladores/controladorSedes.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(() => fetchSedes())
+        // .then($('#modalSedeAgregar').modal('hide'))
+        .catch(error => console.error('Error:', error));
+
+
+    }
+
+    function deleteSede(id) {
+        console.log(id)
+        fetch(`http://localhost/panamericanos2030/controladores/controladorSedes.php`, {
+            method: 'DELETE',
+            body: JSON.stringify({ id_sede: id }), // Incluir el objeto en el cuerpo
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(() => fetchSedes())
+        .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSedes();
+    });
+
+    // Event listener para abrir el modal para agregar una nueva sede
+    document.querySelector('.btn-success').addEventListener('click', function() {
+        // Limpiar el formulario y establecer el título del modal como "Agregar Sede"
+        document.getElementById('formSede').reset();
+        document.getElementById('sedeId').value = '';
+        
+        // Abrir el modal
+        $('#modalSedeAgregar').modal('show');
+    });
+
+    // Event listener para los botones de "Editar", aquí necesitas proporcionar tu propia lógica
+    // para obtener los datos de la sede a editar y poblar el formulario correspondiente.
+    // Los siguientes selectores dependerán de tu implementación actual y pueden necesitar ajustes.
+    // document.querySelectorAll('.btn-primary').forEach(function(btnEdit) {
+    //     btnEdit.addEventListener('click', function() {
+    //         console.log('test')
+            // Aquí deberías obtener los datos de la sede seleccionada para editar
+            // ...
+            
+            // Establecer título y valores para el modal de edición
+            // document.querySelector('#modalSedeLabel').innerText = 'Editar Sede';
+            // Establecer los valores de los campos con la información de la sede (usar tus propios datos)
+            // document.getElementById('sedeId').value = 'ID_ejemplo';
+            // document.getElementById('nombreSede').value = 'Nombre_ejemplo';
+            // document.getElementById('direccionSede').value = 'Dirección_ejemplo';
+
+            // Abrir el modal
+    //         $('#modalSede').modal('show');
+    //     });
+    // });
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .navbar-top {
+            background-color: #032150;
+            color: white;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .navbar-top h1 {
+            flex-grow: 1;
+        }
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+        .sidebar a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+        .sidebar a:hover {
+            color: #f1f1f1;
+        }
+        .sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+        .open-btn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #032150;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+        }
+
+        .open-btn:hover {
+            font-size: 22px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .menu-title {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .main-adjusted {
+            transition: margin-left .5s;
+            margin-left: 250px; /* Esta debe coincidir con el ancho de la sidebar cuando está abierta */
+        }
+
+        /* Agregamos transición al main para que se ajuste de manera suave */
+        main {
+            transition: margin-left .5s;
+            padding-top: 1%;
+        }
+
+        .titles {
+            text-align: center; 
+            background-color: #032150;
+            color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="navbar-top">
+    <button class="open-btn" onclick="openNav()">☰</button>
+
+    <h1>Panamericanos 2030</h1>
+    
+</div>
+
+<div id="mySidebar" class="sidebar">
+    <div class="sidebar-header">
+        <span class="menu-title">Dashboard</span>
+        <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">×</a>
+    </div>
+    <a href="sedes.html">Sedes</a>
+    <a href="deportes.html">Deportes</a>
+    <a href="deportistas.html">Atletas</a>
+</div>
+<div style="width: 100%; text-align: center; padding-top: 20px; align-items: center;">
+    <select name="selectSede" id="selectSedeFiltro" class="form-control" style="width: 10%;  margin: 0 auto;" onchange="fetchDeportes3()"></select>
+</div>
+<div style="width: 100%; text-align: center; padding-top: 20px; align-items: center;">
+    <select name="selectDeporte" id="selectDeporteFiltro" class="form-control" style="width: 10%; margin: 0 auto;" onchange="fetchDeportistasFiltro()"></select>
+</div>
+
+<div style="width: 100%; text-align: right;" >
+    <button type="button" class="btn btn-success" style="margin: 1%;" data-toggle="modal" data-target="#modalDeportista">Agregar un atleta</button>
+</div>
+
+
+
+<main>
+    <table class="table table-hover">
+        <thead>
+            <tr><th colspan="5" class="titles">Listado De Atletas</th></tr>
+            <tr>
+                <th scope="col">Cedula</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Apellido</th>
+                <th scope="col">Deporte</th>
+                <th scope="col">Opciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- <tr>
+              <td style="width: 10%;"></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td style="width: 15%;">
+                <button type="button" class="btn btn-primary">Editar</button>
+                <button type="button" class="btn btn-danger">Eliminar</button>
+              </td>
+            </tr> -->
+          </tbody>
+
+    </table>
+</main>
+
+<!-- Modal para Deportistas -->
+<div class="modal fade" id="modalDeportista" tabindex="-1" role="dialog" aria-labelledby="modalDeportistaLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDeportistaLabel">Deportista</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formDeportista">
+            <input type="hidden" id="deportistaId" value="">
+            <div class="form-group">
+              <label for="cedula">Cédula:</label>
+              <input type="text" class="form-control" id="cedula" required>
+            </div>
+            <div class="form-group">
+              <label for="nombreDeportista">Nombre:</label>
+              <input type="text" class="form-control" id="nombreDeportista" required>
+            </div>
+            <div class="form-group">
+              <label for="apellidoDeportista">Apellido:</label>
+              <input type="text" class="form-control" id="apellidoDeportista" required>
+            </div>
+            <div class="form-group">
+              <label for="deporteDeportista">Deporte:</label>
+              <select class="form-control" id="deporteDeportista" required>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" form="formDeportista" class="btn btn-primary" onclick="addDeportista()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Modal para Deportistas -->
+<div class="modal fade" id="modalDeportistaEditar" tabindex="-1" role="dialog" aria-labelledby="modalDeportistaLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDeportistaLabel1">Deportista</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formDeportista1">
+            <input type="hidden" id="deportistaId" value="">
+            <div class="form-group">
+              <label for="cedula">Cédula:</label>
+              <input type="text" class="form-control" id="cedulaEditar" required>
+            </div>
+            <div class="form-group">
+              <label for="nombreDeportista">Nombre:</label>
+              <input type="text" class="form-control" id="nombreDeportistaEditar" required>
+            </div>
+            <div class="form-group">
+              <label for="apellidoDeportista">Apellido:</label>
+              <input type="text" class="form-control" id="apellidoDeportistaEditar" required>
+            </div>
+            <div class="form-group">
+              <label for="deporteDeportista">Deporte:</label>
+              <select class="form-control" id="deporteDeportistaEditar" required>
+              </select>
+            </div>
+            <input type="hidden" class="form-control" id="idAtletaEditar">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" form="formDeportista1" class="btn btn-primary" onclick="updateDeportista()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+<script>
+
+    function fetchDeportistasFiltro(){
+        const deporteId = document.getElementById('selectDeporteFiltro').value;
+        const sedeId = document.getElementById('selectSedeFiltro').value;
+
+        const data = {
+            sedeId: sedeId,
+            deporteId: deporteId
+        };
+        fetch(`http://localhost/panamericanos2030/controladores/controladorAtletas.php`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+    })
+    .then(response => {
+        // Verifica si la respuesta es exitosa (status 200)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Extrae el cuerpo de la respuesta y lo convierte a JSON
+    })
+    .then(data => {
+        console.log('Data recibida:', data);
+        displayDeportistas(data.response);
+    }) // Llama a la función con los datos obtenidos
+    .catch(error => console.error('Error:', error));
+
+
+    }
+
+
+    function fetchSedes() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorSedes.php')
+        .then(response => response.json())
+        .then(data => selectSedes(data))
+        .catch(error => console.error('Error:', error));
+    }
+    function selectSedes(data){
+        const select = document.getElementById('selectSedeFiltro');
+        data.forEach(item => {
+            
+            var optionElement = document.createElement("option");
+            optionElement.value = item.id_sede;
+            optionElement.text = item.ubicacion;
+            select.appendChild(optionElement);
+
+        });
+    }
+    fetchSedes()
+    function fetchDeportes() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorDeportes.php')
+        .then(response => response.json())
+        .then(data => selectDeportes(data))
+        .catch(error => console.error('Error:', error));
+    }
+    function fetchDeportes2() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorDeportes.php')
+        .then(response => response.json())
+        .then(data => selectDeportes2(data))
+        .catch(error => console.error('Error:', error));
+    }
+    function fetchDeportes3() {
+        const sedeId = document.getElementById('selectSedeFiltro').value;
+        const data = {
+            sedeId: sedeId
+        };
+        fetch(`http://localhost/panamericanos2030/controladores/controladorDeportes.php`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+})
+    .then(response => {
+        // Verifica si la respuesta es exitosa (status 200)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json(); // Extrae el cuerpo de la respuesta y lo convierte a JSON
+    })
+    .then(data => {
+        console.log('Data recibida:', data);
+        selectDeportes3(data.response);
+    }) // Llama a la función con los datos obtenidos
+    .catch(error => console.error('Error:', error));
+
+    }
+
+    fetchDeportes()
+    fetchDeportes2()
+
+    function selectDeportes(data){
+        const select = document.getElementById('deporteDeportista');
+        data.forEach(item => {
+            
+            var optionElement = document.createElement("option");
+            optionElement.value = item.id_deporte;
+            optionElement.text = item.nombre;
+            select.appendChild(optionElement);
+
+        });
+
+    }
+
+    function selectDeportes2(data){
+        const select = document.getElementById('deporteDeportistaEditar');
+        data.forEach(item => {
+            
+            var optionElement = document.createElement("option");
+            optionElement.value = item.id_deporte;
+            optionElement.text = item.nombre;
+            select.appendChild(optionElement);
+
+        });
+
+    }
+
+    function selectDeportes3(data){
+        const select = document.getElementById('selectDeporteFiltro');
+        select.innerHTML = '';
+        data.forEach(item => {
+            var optionElement = document.createElement("option");
+            optionElement.value = item.id_deporte;
+            optionElement.text = item.nombre;
+            select.appendChild(optionElement);
+
+        });
+        select.value = "";
+
+    }
+
+
+    function openNav() {
+        document.getElementById("mySidebar").style.width = "250px";
+        document.querySelector("main").classList.add("main-adjusted");
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.width = "0";
+        document.querySelector("main").classList.remove("main-adjusted");
+    }
+
+    function fetchDeportistas() {
+        fetch('http://localhost/panamericanos2030/controladores/controladorAtletas.php')
+        .then(response => response.json())
+        .then(data => displayDeportistas(data))
+        .catch(error => console.error('Error:', error));
+    }
+
+    function displayDeportistas(deportistas) {
+        const tbody = document.querySelector('table.table tbody');
+        tbody.innerHTML = ''; 
+        deportistas.forEach(deportista => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${deportista.identificacion}</td>
+                <td>${deportista.nombre}</td>
+                <td>${deportista.apellido}</td>
+                <td>${deportista.nombre_deporte}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" onclick="editDeportista(${deportista.identificacion}, '${deportista.nombre}', '${deportista.apellido}', ${deportista.id_deporte}, ${deportista.id_atleta})">Editar</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteDeportista(${deportista.id_atleta})">Eliminar</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function editDeportista(identificacion, nombre, apellido, id_deporte, id_atleta) {
+        document.getElementById('cedulaEditar').value = identificacion;
+        document.getElementById('nombreDeportistaEditar').value = nombre;
+        document.getElementById('apellidoDeportistaEditar').value = apellido;
+        document.getElementById('deporteDeportistaEditar').value = id_deporte;
+        document.getElementById('idAtletaEditar').value = id_atleta;
+
+        $('#modalDeportistaEditar').modal('show');
+    }
+
+    function updateDeportista() {
+
+        identificacion = document.getElementById('cedulaEditar').value;
+        nombre = document.getElementById('nombreDeportistaEditar').value;
+        apellido = document.getElementById('apellidoDeportistaEditar').value;
+        id_deporte = document.getElementById('deporteDeportistaEditar').value;
+        id_atleta = document.getElementById('idAtletaEditar').value;
+
+        const data = {
+            nombre: nombre,
+            apellido: apellido,
+            identificacion: identificacion,
+            nuevo_id_deporte: id_deporte,
+            id_atleta: id_atleta
+        };
+
+    fetch(`http://localhost/panamericanos2030/controladores/controladorAtletas.php`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(() => fetchDeportistas())
+        .catch(error => console.error('Error:', error));
+    }
+
+    function addDeportista() {
+        var nombre = document.getElementById('nombreDeportista').value;
+        var apellido = document.getElementById('apellidoDeportista').value;
+        var identificacion = document.getElementById('cedula').value;
+        var deporte = document.getElementById('deporteDeportista').value;
+
+        const data = {
+            nombre: nombre,
+            apellido: apellido,
+            identificacion: identificacion,
+            deporte: deporte,
+        };
+
+        fetch('http://localhost/panamericanos2030/controladores/controladorAtletas.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(() => fetchDeportistas())
+        .catch(error => console.error('Error:', error));
+    }
+
+    function deleteDeportista(id) {
+        console.log(id)
+        fetch(`http://localhost/panamericanos2030/controladores/controladorAtletas.php`, {
+            method: 'DELETE',
+            body: JSON.stringify({ id_atleta: id }), // Incluir el objeto en el cuerpo
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(() => fetchDeportistas())
+        .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchDeportistas();
+    });
+
+    // document.querySelector('.btn-success').addEventListener('click', function() {
+
+    //     document.getElementById('formDeportista').reset();
+    //     document.getElementById('deportistaId').value = '';
+        
+    //     document.querySelector('#modalDeportistaLabel').innerText = 'Agregar un atleta';
+
+    //     $('#modalDeportista').modal('show');
+    // });
+
+    // document.querySelectorAll('.btn-primary').forEach(function(btnEdit) {
+    //     btnEdit.addEventListener('click', function() {
+
+    //         document.querySelector('#modalDeportistaLabel').innerText = 'Editar atleta';
+    //         document.getElementById('deportistaId').value = 'ID_ejemplo';
+    //         document.getElementById('cedula').value = 'Cédula_ejemplo';
+    //         document.getElementById('nombreDeportista').value = 'Nombre_ejemplo';
+    //         document.getElementById('apellidoDeportista').value = 'Apellido_ejemplo';
+    //         document.getElementById('deporteDeportista').value = 'Deporte_ejemplo';
+
+    //         $('#modalDeportista').modal('show');
+    //     });
+    // });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
